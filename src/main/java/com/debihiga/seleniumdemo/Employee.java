@@ -1,0 +1,131 @@
+package com.debihiga.seleniumdemo;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.persistence.*;
+import java.util.Objects;
+
+/**
+ * From: https://spring.io/guides/tutorials/react-and-spring-data-rest/
+ *
+ * Entity -> class for storage in a relational table.
+ * */
+@Entity
+public class Employee {
+
+    @Id
+    @GeneratedValue
+    private Long id; // primary key, generated automatically when needed.
+    private String firstName;
+    private String lastName;
+    private String description;
+
+    /**
+     * When you fetch a resource,
+     * the risk is that it might go stale if someone else updates it.
+     * To deal with this, Spring Data REST integrates two technologies: versioning of resources (1) and ETags (2).
+     * By versioning resources on the backend and using ETags in the frontend,
+     * it is possible to conditionally PUT a change.
+     * In other words, you can detect whether a resource has changed and
+     * prevent a PUT (or a PATCH) from stomping on someone else’s update.
+     *
+     * (1) The annotation javax.persistence.Version
+     * causes a value to be automatically stored and updated every time a row is inserted and updated.
+     * (2) When fetching an individual resource (not a collection resource),
+     * Spring Data REST automatically adds an ETag response header with the value of this field.
+     * */
+    private @Version
+    @JsonIgnore
+    Long version;
+
+    private @ManyToOne
+    Manager manager;
+
+    private Employee() {}
+
+    public Employee(String firstName, String lastName, String description, Manager manager) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.description = description;
+        this.manager = manager;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Employee employee = (Employee) o;
+        return Objects.equals(id, employee.id) &&
+                Objects.equals(firstName, employee.firstName) &&
+                Objects.equals(lastName, employee.lastName) &&
+                Objects.equals(description, employee.description) &&
+                Objects.equals(version, employee.version) &&
+                Objects.equals(manager, employee.manager);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, firstName, lastName, description, version, manager);
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
+
+    public Manager getManager() {
+        return manager;
+    }
+
+    public void setManager(Manager manager) {
+        this.manager = manager;
+    }
+
+    @Override
+    public String toString() {
+        return "Employee{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", description='" + description + '\'' +
+                ", version=" + version +
+                ", manager=" + manager +
+                '}';
+    }
+
+}
